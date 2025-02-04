@@ -6,7 +6,7 @@ __pycache__/
 .Python
 
 # Virtual Environment
-sls/         # Eğer sanal ortamınız bu klasördeyse, onu yok sayın
+sls/
 venv/
 ENV/
 
