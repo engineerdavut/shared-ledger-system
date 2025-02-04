@@ -4,13 +4,14 @@ __pycache__/
 *$py.class
 *.so
 .Python
+
+# Virtual Environment
+sls/         # Eğer sanal ortamınız bu klasördeyse, onu yok sayın
 venv/
 ENV/
 
 # Logs
 *.log
-s
-
 
 # IDE
 .idea/
