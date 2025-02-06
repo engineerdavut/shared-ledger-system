@@ -1,5 +1,6 @@
 # core/ledgers/models.py
 from datetime import datetime
+import sqlalchemy
 from sqlalchemy import Column, Integer, String, DateTime, Enum as SQLAlchemyEnum
 from core.db.base import Base
 

@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+# asyncio_default_fixture_loop_scope = "function"  # Buna GEREK YOK
+# asyncio_fixture_loop_scope = "function" # BUNA DA GEREK YOK
+addopts = "--asyncio-mode=auto"
+
+[project]
+name = "shared-ledger-system"
+version = "0.1.0"
+description = "A shared ledger system for a monorepo with multiple apps."
+authors = [{ name = "Davut Aktas", email = "davut@davutaktas.online" }]
+dependencies = [
+    "fastapi>=0.78.0",
+    "uvicorn[standard]",
+    "SQLAlchemy>=2.0.0",
+    "pydantic",
+    "alembic",
+    "asyncpg",
+    "python-dotenv"
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py311']

@@ -1,6 +1,6 @@
 # core/ledgers/schemas.py
 from datetime import datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict  # ConfigDict'i import et
 from typing import Generic, TypeVar
 
 T = TypeVar('T')
@@ -18,8 +18,8 @@ class LedgerEntry(LedgerEntryBase):
     id: int
     created_on: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)  # class Config -> ConfigDict
+
 
 class LedgerBalance(BaseModel):
     owner_id: str

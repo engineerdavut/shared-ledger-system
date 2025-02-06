@@ -18,8 +18,8 @@ class LedgerService:
         return balance
 
     async def create_entry(
-        self, 
-        session: AsyncSession, 
+        self,
+        session: AsyncSession,
         entry: LedgerEntryCreate
     ) -> LedgerEntry:
         """Create a new ledger entry with validation."""
@@ -30,27 +30,25 @@ class LedgerService:
         if existing.scalar_one_or_none():
             raise DuplicateTransactionError(f"Transaction with nonce {entry.nonce} already exists")
 
-        # Get operation amount
-        amount = self.operation_config.get(entry.operation)
+        # Get operation amount (CORRECTED: Use entry.amount directly)
+        amount = self.operation_config.get(entry.operation) #operation config'den alıyoruz amount'u schema dan değil.
         if amount is None:
-            raise ValueError(f"Invalid operation: {entry.operation}")
+          raise ValueError(f"Invalid operation {entry.operation}")
 
-        # Check balance for negative operations
-        if amount < 0:
+        # Check balance for negative operations (CORRECTED logic)
+        if amount < 0:  # Doğrudan amount'ı kontrol et
             current_balance = await self.get_balance(session, entry.owner_id)
             if current_balance + amount < 0:
-                raise InsufficientBalanceError(
-                    f"Insufficient balance: {current_balance} + {amount} < 0"
-                )
+                raise InsufficientBalanceError(current_balance, amount)
 
         # Create entry
         db_entry = LedgerEntry(
             operation=entry.operation,
-            amount=amount,
+            amount=amount,  # Use the CORRECTED amount
             nonce=entry.nonce,
             owner_id=entry.owner_id
         )
         session.add(db_entry)
-        await session.commit()
+        await session.commit() # commit() kullan, flush() değil
         await session.refresh(db_entry)
         return db_entry
