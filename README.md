@@ -98,9 +98,9 @@ shared-ledger-system/
       ├── .gitignore
       ├── .env
       ├── core/
-      │   ├── init.py
+      │   ├── __init__.py
       │   ├── ledgers/
-      │   │   ├── init.py
+      │   │   ├── __init__.py
       │   │   ├── models.py
       │   │   ├── schemas.py
       │   │   ├── operations.py
@@ -112,20 +112,20 @@ shared-ledger-system/
       │        │     │   ├── env.py
       │        │     │   └── versions/
       │        │     └── alembic.ini
-      │        ├── init.py
+      │        ├── __init__.py
       │        └── base.py
       ├── apps/
       │   ├── app1/
       │   │   ├── src/
-      │   │   │   ├── init.py
+      │   │   │   ├── __init__.py
       │   │   │   ├── api/
       │   │   │   │     └── core/
-      │   │   │   │          ├── init.py
+      │   │   │   │          ├── __init__.py
       │   │   │   │          └── ledgers/
-      │   │   │   │                ├── init.py
+      │   │   │   │                ├── __init__.py
       │   │   │   │                ├── routes.py
       │   │   │   │                └── schemas.py
-      │   │   │   ├── init.py
+      │   │   │   ├── __init__.py
       │   │   │   └── main.py
       │   │   └── tests/
       │   └── app2/
