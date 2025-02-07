@@ -1,7 +1,7 @@
 import os
 import sys
 from logging.config import fileConfig
-from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine  # AsyncEngine ve create_async_engine importu
+from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine 
 import asyncio
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../')))
@@ -10,7 +10,7 @@ from sqlalchemy import pool
 from alembic import context
 from dotenv import load_dotenv
 
-load_dotenv()  # .env dosyasını yükle
+load_dotenv()  
 
 config = context.config
 config.set_main_option("sqlalchemy.url", os.getenv("DATABASE_URL"))

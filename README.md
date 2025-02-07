@@ -236,6 +236,7 @@ uvicorn apps.app1.src.main:app --reload --host 0.0.0.0 --port 8000
 
 The API will be available at http://localhost:8000 
 Swagger documentation at http://localhost:8000/docs 
+
 3. **Usage**:
 
    - Access your app at [http://localhost:8000](http://localhost:8000)
