@@ -1,13 +1,7 @@
+#pyproject.toml
 [build-system]
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-asyncio_mode = "auto"
-# asyncio_default_fixture_loop_scope = "function"  # Buna GEREK YOK
-# asyncio_fixture_loop_scope = "function" # BUNA DA GEREK YOK
-addopts = "--asyncio-mode=auto"
 
 [project]
 name = "shared-ledger-system"
@@ -21,6 +15,9 @@ dependencies = [
     "pydantic",
     "alembic",
     "asyncpg",
+    "prometheus-client>=0.20.0", 
+    "python-jose[cryptography]>=3.3.0", 
+    "passlib", 
     "python-dotenv"
 ]
 

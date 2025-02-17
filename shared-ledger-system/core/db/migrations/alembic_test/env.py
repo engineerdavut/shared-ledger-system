@@ -1,11 +1,10 @@
-# core/db/migrations/alembic/env.py
+# core/db/migrations/alembic_test/env.py
 import os
 import sys
 from logging.config import fileConfig
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 import asyncio
 import nest_asyncio
-from alembic import context
 
 nest_asyncio.apply()
 
@@ -26,10 +25,6 @@ target_metadata = Base.metadata
 
 config = context.config
 
-db_url = context.get_x_argument(as_dictionary=True).get("sqlalchemy.url")
-if not db_url:
-    db_url = os.getenv("DATABASE_URL")
-context.configure(url=db_url, target_metadata=target_metadata)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)

@@ -8,6 +8,7 @@ from core.ledgers.models import LedgerEntry
 import uuid
 from sqlalchemy import delete
 
+
 @pytest.fixture
 def ledger_service():
     config = {
@@ -18,62 +19,58 @@ def ledger_service():
     }
     return LedgerService(config)
 
+
 @pytest.mark.asyncio
 async def test_get_balance(ledger_service: LedgerService, async_session: AsyncSession):
     await async_session.execute(delete(LedgerEntry))
     await async_session.commit()
-    # Create some test entries
     entry1 = LedgerEntryCreate(
-        operation="CREDIT_ADD",
-        owner_id="test_user",
-        nonce=str(uuid.uuid4()),
-        amount=10  # Gerekli, schemas.py'da zorunlu alan.
+        operation="CREDIT_ADD", owner_id="test_user", nonce=str(uuid.uuid4()), amount=10
     )
     entry2 = LedgerEntryCreate(
         operation="CREDIT_SPEND",
         owner_id="test_user",
         nonce=str(uuid.uuid4()),
-        amount=-1 # Gerekli, schemas.py'da zorunlu alan.
+        amount=-1,
     )
 
     await ledger_service.create_entry(async_session, entry1)
     await ledger_service.create_entry(async_session, entry2)
 
     balance = await ledger_service.get_balance(async_session, "test_user")
-    assert balance == 9  # (10) + (-1) = 9
+    assert balance == 9
 
 
 @pytest.mark.asyncio
-async def test_insufficient_balance(ledger_service: LedgerService, async_session: AsyncSession):
+async def test_insufficient_balance(
+    ledger_service: LedgerService, async_session: AsyncSession
+):
     await async_session.execute(delete(LedgerEntry))
     await async_session.commit()
     entry = LedgerEntryCreate(
         operation="CREDIT_SPEND",
         owner_id="test_user",
         nonce=str(uuid.uuid4()),
-        amount=-1  # Gerekli
+        amount=-1,
     )
 
     with pytest.raises(InsufficientBalanceError):
         await ledger_service.create_entry(async_session, entry)
 
+
 @pytest.mark.asyncio
-async def test_duplicate_nonce(ledger_service: LedgerService, async_session: AsyncSession):
+async def test_duplicate_nonce(
+    ledger_service: LedgerService, async_session: AsyncSession
+):
     nonce = str(uuid.uuid4())
     entry = LedgerEntryCreate(
-        operation="CREDIT_ADD",
-        amount=10,  # amount zorunlu, herhangi bir değer olabilir
-        owner_id="test_user",
-        nonce=nonce
+        operation="CREDIT_ADD", amount=10, owner_id="test_user", nonce=nonce
     )
 
     await ledger_service.create_entry(async_session, entry)
 
     duplicate_entry = LedgerEntryCreate(
-        operation="CREDIT_ADD",
-        amount=5,  # amount zorunlu, herhangi bir değer olabilir
-        owner_id="test_user",
-        nonce=nonce
+        operation="CREDIT_ADD", amount=5, owner_id="test_user", nonce=nonce
     )
 
     with pytest.raises(DuplicateTransactionError):
@@ -81,12 +78,14 @@ async def test_duplicate_nonce(ledger_service: LedgerService, async_session: Asy
 
 
 @pytest.mark.asyncio
-async def test_invalid_operation(ledger_service: LedgerService, async_session: AsyncSession):
+async def test_invalid_operation(
+    ledger_service: LedgerService, async_session: AsyncSession
+):
     entry = LedgerEntryCreate(
         operation="INVALID_OPERATION",
-        amount=10, # amount zorunlu
+        amount=10,
         owner_id="test_user",
-        nonce=str(uuid.uuid4())
+        nonce=str(uuid.uuid4()),
     )
     with pytest.raises(ValueError):
         await ledger_service.create_entry(async_session, entry)

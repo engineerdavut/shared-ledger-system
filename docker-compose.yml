@@ -1,0 +1,88 @@
+services:
+  app1:
+    build:
+      context: .
+      dockerfile: shared-ledger-system/apps/app1/src/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:12345@db:5432/shared_ledger_db
+      REDIS_URL: redis://redis:6379
+      SECRET_KEY: your-secret-key
+    volumes:
+      - ./shared-ledger-system/core/db/migrations:/app/core/db/migrations
+    depends_on:
+      - db
+      - redis
+    restart: always 
+  tests:
+    build:
+      context: .
+      dockerfile: shared-ledger-system/apps/app1/src/Dockerfile
+    command: pytest /app/tests
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:12345@db:5432/test_db
+      REDIS_URL: redis://redis:6379/1
+      SECRET_KEY: your-test-secret-key
+      ENVIRONMENT: test
+    depends_on:
+      - db
+      - redis
+#  app2:  
+#    build:
+#      context: ./shared-ledger-system/apps/app2/src
+#      dockerfile: Dockerfile 
+#    ports:
+#      - "8001:8000" 
+#    environment:
+#      DATABASE_URL: postgresql+asyncpg://postgres:password@db:5432/shared_ledger_db 
+#      REDIS_URL: redis://redis:6379 
+#      SECRET_KEY: another-secret-key-for-app2 
+#    depends_on:
+#      - db
+#      - redis
+#    restart: always 
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    restart: always 
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always 
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - app1
+    restart: always 
+
+  grafana: 
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    restart: always 
+
+volumes:
+  db_data:
+  redis_data:
+  prometheus_data:
+  grafana_data: 

@@ -1,9 +1,10 @@
 # core/ledgers/schemas.py
 from datetime import datetime
-from pydantic import BaseModel, Field, ConfigDict  # ConfigDict'i import et
-from typing import Generic, TypeVar
+from pydantic import BaseModel, Field, ConfigDict
+from typing import TypeVar
 
-T = TypeVar('T')
+T = TypeVar("T")
+
 
 class LedgerEntryBase(BaseModel):
     operation: str
@@ -11,8 +12,10 @@ class LedgerEntryBase(BaseModel):
     owner_id: str = Field(..., description="ID of the ledger owner")
     nonce: str = Field(..., description="Unique identifier for the transaction")
 
+
 class LedgerEntryCreate(LedgerEntryBase):
     pass
+
 
 class LedgerEntry(LedgerEntryBase):
     id: int

@@ -1,8 +1,19 @@
+                              
+---
+
 # Shared Ledger System
 
-A monorepo-based **Shared Ledger System** designed to track user credits across multiple applications. 
-This system ensures **type safety**, **code reuse**, and **extensibility** by allowing each application 
-to add its own custom ledger operations on top of shared core operations.
+A monorepo-based **Shared Ledger System** designed to track user credits across multiple applications.  
+This system ensures **type safety**, **code reuse**, and **extensibility** by allowing each application to add its own custom ledger operations on top of shared core operations.
+
+New features include:  
+- **Authentication & Authorization**  
+- **Rate Limiting**  
+- **Containerization with Docker and Docker Compose**  
+- **Prometheus Monitoring**  
+- **Grafana Dashboards**  
+- **Advanced Logging**  
+- **Redis Caching**
 
 ---
 
@@ -16,14 +27,22 @@ to add its own custom ledger operations on top of shared core operations.
 6. [Installation and Setup](#installation-and-setup)  
 7. [Running the Applications](#running-the-applications)  
 8. [API Endpoints](#api-endpoints)  
-9. [Redoc Documentation](#redoc-documentation)  
-10. [Testing](#testing)  
-11. [Migration Examples](#migration-examples)  
-12. [Submission Guidelines](#submission-guidelines)  
-13. [Recommendations](#recommendations)  
-14. [Contributing](#contributing)
-15. [Acknowledgments](#acknowledgments)  
-16. [License](#license)
+9. [Authentication Endpoints](#authentication-endpoints)  
+10. [Rate Limiting](#rate-limiting)  
+11. [Prometheus Monitoring](#prometheus-monitoring)  
+12. [Grafana Dashboard](#grafana-dashboard)  
+13. [Logging](#logging)  
+14. [Redis Cache](#redis-cache)  
+15. [Usage](#usage)  
+16. [Redoc Documentation](#redoc-documentation)  
+17. [Testing](#testing)  
+18. [Migration Examples](#migration-examples)  
+19. [Submission Guidelines](#submission-guidelines)  
+20. [Recommendations](#recommendations)  
+21. [Contributing](#contributing)  
+22. [Acknowledgments](#acknowledgments)  
+23. [AI Tools Used](#ai-tools-used)  
+24. [License](#license)
 
 ---
 
@@ -33,6 +52,8 @@ to add its own custom ledger operations on top of shared core operations.
 - **Type Safety**: Enforce a consistent, type-safe approach to shared ledger operations using Python Enums, Pydantic, and SQLAlchemy.
 - **Extensibility**: Allow individual applications to define additional ledger operations without breaking shared functionality.
 - **Database Integrity**: Ensure each transaction is tracked and stored with strict data integrity using Postgres and Alembic migrations.
+- **Enhanced Security & Performance**: With integrated authentication, rate limiting, and Redis caching, the system is designed to be secure and performant.
+- **Observability**: Utilize Prometheus for monitoring, Grafana for dashboards, and advanced logging for troubleshooting.
 
 ---
 
@@ -40,26 +61,16 @@ to add its own custom ledger operations on top of shared core operations.
 
 - ✅ **Type-safe ledger operations**  
 - ✅ **Enforced shared operations**  
-- ✅ **Detailed logging**  
+- ✅ **Authentication & Authorization**  
+- ✅ **Rate Limiting for API endpoints**  
+- ✅ **Containerized deployment using Docker and Docker Compose**  
+- ✅ **Prometheus Monitoring for system metrics**  
+- ✅ **Grafana Dashboards for visualization**  
+- ✅ **Advanced logging mechanism**  
+- ✅ **Redis Caching for improved performance**  
 - ✅ **Async database operations with SQLAlchemy**  
 - ✅ **Comprehensive test coverage**  
-- ✅ **Alembic migrations**  
-
-## Project Purpose
-
-Design and implement a **Shared Ledger System** in a monorepo containing multiple applications.
-Each application needs to track user credits through a ledger while enforcing shared operations,
-type safety, and reusability.
-
-### Background
-
-- You are working on a monorepo where multiple applications all rely on a shared ledger functionality.
-- Each application needs both the common ledger operations and potentially its own specialized operations.
-- The core system must enforce mandatory operations (e.g., `DAILY_REWARD`, `SIGNUP_CREDIT`, `CREDIT_SPEND`, `CREDIT_ADD`)
-  while allowing extension for app-specific needs.
-
-> **Note**: Prometheus, Redis, rate limiting, or authentication are **not** implemented at this time.
-
+- ✅ **Alembic migrations**
 
 ---
 
@@ -71,6 +82,11 @@ type safety, and reusability.
 - **Pydantic**
 - **Alembic**
 - **PostgreSQL**
+- **Redis** (for caching)
+- **Docker & Docker Compose**
+- **Prometheus** (for monitoring)
+- **Grafana** (for dashboards)
+- **Python-Jose & Passlib** (for authentication)
 
 ### Example Ledger Configuration
 
@@ -84,79 +100,119 @@ LEDGER_OPERATION_CONFIG = {
     "CONTENT_ACCESS": 0,
 }
 ```
+
 ---
 
 ## Directory Structure
 
-A suggested directory layout for the monorepo is as follows:
 ```plaintext
 shared-ledger-system/
-      shared-ledger-system/
-      ├── README.md
-      ├── pyproject.toml
-      ├── requirements.txt
-      ├── .gitignore
-      ├── .env
-      ├── core/
-      │   ├── __init__.py
-      │   ├── ledgers/
-      │   │   ├── __init__.py
-      │   │   ├── models.py
-      │   │   ├── schemas.py
-      │   │   ├── operations.py
-      │   │   ├── exceptions.py
-      │   │   └── service.py
-      │   └── db/
-      │        ├── migrations/
-      │        │     ├── alembic/
-      │        │     │   ├── env.py
-      │        │     │   └── versions/
-      │        │     └── alembic.ini
-      │        ├── __init__.py
-      │        └── base.py
-      ├── apps/
-      │   ├── app1/
-      │   │   ├── src/
-      │   │   │   ├── __init__.py
-      │   │   │   ├── api/
-      │   │   │   │     └── core/
-      │   │   │   │          ├── __init__.py
-      │   │   │   │          └── ledgers/
-      │   │   │   │                ├── __init__.py
-      │   │   │   │                ├── routes.py
-      │   │   │   │                └── schemas.py
-      │   │   │   ├── __init__.py
-      │   │   │   └── main.py
-      │   │   └── tests/
-      │   └── app2/
-      │       └── (similar structure)
-      └── tests/
-              └── core/
-              |  |── ledgers/
-              |  |       ├── test_operations.py
-              |  |       └── test_service.py
-              |  └── conftest.py
-              └── apps/
-                  └── app1/
-                        └── test_api.py
+         |    
+         ├── README.md
+         ├── pyproject.toml
+         ├── requirements.txt
+         ├── docker-compose.yml
+         ├── entrypoint.sh
+         ├── prometheus.yml
+         ├── .gitignore
+         ├── .env
+         └── shared-ledger-system/
+                     ├── apps/
+                     │   ├── app1/
+                     │   │   ├── src/
+                     │   │   │   ├── __init__.py
+                     │   │   │   ├──  config.py
+                     │   │   │   ├──  Dockerfile
+                     │   │   │   ├──  main.py
+                     │   │   │   └──  api/
+                     │   │   │         ├── __init__.py
+                     │   │   │         └── core/
+                     │   │   │               ├── __init__.py
+                     │   │   │               └── ledgers/
+                     │   │   │                       ├── __init__.py
+                     │   │   │                       ├── dependencies.py
+                     │   │   │                       ├── routes.py
+                     │   │   │                       └── schemas.py
+                     │   │   └── tests/
+                     │   └── app2/
+                     │       └── (similar structure)
+                     ├── core/
+                     │     ├── __init__.py
+                     |     ├── config.py
+                     │     ├── auth/
+                     │     │     ├── __init__.py
+                     │     │     ├── models.py
+                     │     │     ├── routes.py                    
+                     │     │     ├── schemas.py
+                     │     │     └── service.py
+                     │     ├── cache/
+                     │     │     ├── __init__.py
+                     │     │     └──  cache.py
+                     │     ├── db/
+                     │     │     ├── __init__.py
+                     │     │     ├── base.py
+                     │     │     └── migrations/
+                     │     │             ├── __init__.py
+                     │     │             ├── alembic_test.ini
+                     │     │             ├── alembic.ini
+                     │     │             ├── alembic/
+                     │     │             │       ├── __init__.py
+                     │     │             │       ├── env.py
+                     │     │             │       └── versions/
+                     │     │             │             ├── __init__.py
+                     │     │             │             ├── 0001_initial.py
+                     │     │             │             └── 0002_add_more_operations.py
+                     │     │             └── alembic_test/
+                     │     │                    ├── __init__.py
+                     │     │                    └── env.py
+                     │     │
+                     │     ├── ledgers/
+                     │     │       ├── __init__.py
+                     │     │       ├── exceptions.py
+                     │     │       ├── models.py
+                     │     │       ├── operations.py
+                     │     │       ├── schemas.py
+                     │     │       └── service.py
+                     │     ├── logging/
+                     │     │     ├── __init__.py
+                     │     │     └── logger.py
+                     │     └── monitoring/
+                     │              ├── __init__.py
+                     │              └── prometheus.py
+                     ├── tests/
+                     │     ├── __init__.py
+                     │     ├── conftest.py
+                     │     ├── apps/
+                     │     │     ├── app1/
+                     │     │     │   ├── __init__.py
+                     │     │     │   ├── test_api.py
+                     │     │     │   ├── test_auth.py
+                     │     │     │   ├── test_prometheus.py
+                     │     │     │   └── test_rate_limit.py      
+                     │     │     └── app2/
+                     │     └── core/
+                     │         ├── __init__.py
+                     │         ├── auth/
+                     │         │     └── test_auth_service.py
+                     │         ├── cache/
+                     │         │     └──  test_cache.py
+                     │         ├── ledgers/
+                     │         │     ├── test_operations.py
+                     │         │     └── test_service.py
+                     │         ├── logging/
+                     │         │     └── test_logger.py
+                     │         └── monitoring/
+                     │             └── test_prometheus.py
+                     └── pytest.ini
+ ``` 
 
-```
-
-- **shared-ledger-system/:** The root directory of the monorepo.
-
-    - README.md: Project description and instructions.
-    - pyproject.toml: Project configuration file.
-    - requirements.txt: List of dependencies.
-    - .gitignore: Git ignore file.
-    - .env: Environment variables file.
-
-- **core/:** Houses the core ledger functionality.
-
-- **core/ledgers/**: Shared ledger models, schemas, and operations.
-
-- **apps/app1/**: A sample application demonstrating usage of the core ledger.
-
-- **tests/**: Houses tests for both core and applications.
+- **shared-ledger-system/**: The root directory.
+  - **.env**: Environment variables for local development.
+  - **.env.test**: Environment variables for testing.
+  - **docker-compose.yml**: Docker Compose configuration including a test container that runs tests automatically.
+- **core/**: Contains the core ledger functionality and new features.
+- **apps/**: Contains multiple applications consuming the core ledger functionalities.
+- **tests/**: Contains tests for core and application-specific features.
 
 ---
 
@@ -165,8 +221,7 @@ shared-ledger-system/
 ### Shared vs. Application-Specific Ledger Operations
 
 - **Shared Operations**: `DAILY_REWARD`, `SIGNUP_CREDIT`, `CREDIT_SPEND`, `CREDIT_ADD`
-
-- **App-Specific Operations**: For instance, `CONTENT_CREATION`, `CONTENT_ACCESS`
+- **App-Specific Operations**: For example, `CONTENT_CREATION`, `CONTENT_ACCESS`
 
 ### Example Enum Usage
 
@@ -187,85 +242,99 @@ class GoodOperation(BaseLedgerOperation):
     CONTENT_CREATION = "CONTENT_CREATION"
 ```
 
+---
+
 ## Installation and Setup
 
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd shared-ledger-system 
-```
-2. Create and activate virtual environment:
-```bash
-python -m venv venv
-# Windows
-.\venv\Scripts\activate
-# Linux/Mac
-source venv/bin/activate
-```
-3. Install dependencies:
-```
-pip install -r requirements.txt
-```
-4. Set up environment variables (.env):
-```env
-DATABASE_URL=postgresql+asyncpg://postgres:12345@localhost:5432/shared_ledger_system
-TEST_DATABASE_URL=postgresql+asyncpg://postgres:12345@localhost:5432/test_db
-```
-5. Run database migrations:
-```
-cd shared-ledger-system
-cd core/db/migrations
-alembic init alembic
-alembic upgrade head
-```
-6. **Configure Application**:
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd shared-ledger-system 
+   ```
 
-   Adjust settings or config files as needed for each app.
+2. **Create and activate a virtual environment:**
+   ```bash
+   python -m venv venv
+   # Windows:
+   .\venv\Scripts\activate
+   # Linux/Mac:
+   source venv/bin/activate
+   ```
 
+3. **Install necessary packages:**
+   ```bash
+   pip install fastapi[all] sqlalchemy[async] alembic pydantic python-jose[cryptography] passlib[bcrypt] pytest pytest-asyncio aioredis
+   ```
 
-## Running the Applications
+4. **Generate requirements.txt:**
+   ```bash
+   pip freeze > requirements.txt
+   ```
 
+5. **Set up environment variables:**
 
-1. Start PostgreSQL server
-2. Run the application:
+   Create a `.env` file for local development and a `.env.test` file for testing.
+   ```env
+   # .env
+   DATABASE_URL=postgresql+asyncpg://postgres:12345@localhost:5432/shared_ledger_system
+   TEST_DATABASE_URL=postgresql+asyncpg://postgres:12345@localhost:5432/test_db
+   REDIS_URL=redis://localhost:6379/0
+   SECRET_KEY=your_secret_key_here
+   ```
 
-```bash
-cd shared-ledger-system
-uvicorn apps.app1.src.main:app --reload --host 0.0.0.0 --port 8000  
-```
+6. **Run database migrations:**
+   ```bash
+   cd shared-ledger-system/core/db/migrations
+   alembic upgrade head
+   ```
 
-The API will be available at http://localhost:8000 
-Swagger documentation at http://localhost:8000/docs 
+7. **Docker Setup:**
 
-3. **Usage**:
+   Run the entire system using Docker and Docker Compose:
+   ```bash
+   docker-compose up --build
+   ```
+   
+   The `docker-compose.yml` starts containers for:
+   - **app1**: The primary application.
+   - **tests**: A dedicated test container that automatically runs tests.
+   - **db**: PostgreSQL database.
+   - **redis**: Redis caching.
+   - **prometheus**: Monitoring with Prometheus.
+   - **grafana**: Visualization and dashboarding with Grafana.
 
-   - Access your app at [http://localhost:8000](http://localhost:8000)
+8. **Configure Application:**
+
+   Adjust configuration files as needed.
 
 ---
 
-### Usage    
+## Running the Applications
 
-1. Create a new ledger entry:
-```curl     
-curl -X POST http://localhost:8000/ledger/ -H "Content-Type: application/json" -d '{"operation": "CREDIT_ADD", "amount": 10, "owner_id": "test_user", "nonce": "123e4567-e89b-12d3-a456-426655440000"}'
-```
+1. **Start Required Services:**
+   - Ensure Redis and PostgreSQL are running.
+   - Prometheus and Grafana are started as part of the Docker Compose setup.
+2. **Run the application:**
+   ```bash
+   cd shared-ledger-system
+   uvicorn apps.app1.src.main:app --reload --host 0.0.0.0 --port 8000  
+   ```
+   
+   The API is available at [http://localhost:8000](http://localhost:8000)  
+   Swagger documentation: [http://localhost:8000/docs](http://localhost:8000/docs)
 
-2. Get the current balance of a user:
-```curl
-curl -X GET http://localhost:8000/ledger/test_user
-```    
 ---
 
 ## API Endpoints
 
-### GET /ledger/{owner_id}
+### Ledger Endpoints
 
-- **Description**: Returns current balance for `owner_id`.
+- **GET /ledger/{owner_id}**  
+  Returns the current balance for the specified `owner_id`.
 
-### POST /ledger
-
-- **Request Body** (example):
-
+- **POST /ledger**  
+  Creates a new ledger entry.  
+  **Request Body (example):**
   ```json
   {
     "owner_id": "user123",
@@ -274,18 +343,143 @@ curl -X GET http://localhost:8000/ledger/test_user
     "nonce": "unique-transaction-id"
   }
   ```
-
-- **Behavior**:
-
-  1. Ensures sufficient balance if the operation is negative.
+  **Behavior:**
+  1. Checks for sufficient balance if the operation is negative.
   2. Prevents duplicate transactions using `nonce`.
+
+---
+
+## Authentication Endpoints
+
+- **POST /auth/register**  
+  Register a new user.  
+  **Example Request:**
+  ```bash
+  curl -X POST http://localhost:8000/auth/register \
+    -H "Content-Type: application/json" \
+    -d '{"username": "testuser", "password": "Test@1234"}'
+  ```
+
+- **POST /auth/token**  
+  Log in to retrieve an access token.  
+  **Example Request:**
+  ```bash
+  curl -X POST http://localhost:8000/auth/token \
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -d "username=testuser&password=Test@1234"
+  ```
+  **Expected Response:**
+  ```json
+  {
+    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "token_type": "bearer"
+  }
+  ```
+
+- **GET /auth/me**  
+  Retrieve details of the currently authenticated user.  
+  **Example Request:**
+  ```bash
+  curl -X GET http://localhost:8000/auth/me \
+    -H "Authorization: Bearer <your-access-token>"
+  ```
+
+---
+
+## Rate Limiting
+
+Rate limiting is implemented via middleware and decorators to protect API endpoints from abuse.  
+Refer to `tests/apps/app1/test_rate_limit.py` for sample tests.
+
+---
+
+## Prometheus Monitoring
+
+Prometheus monitors system metrics.  
+- **Configuration:** `prometheus.yml`  
+- **Integration:** `core/monitoring/prometheus.py`  
+- **Usage:** Metrics are accessible at [http://localhost:8000/metrics](http://localhost:8000/metrics).
+
+---
+
+## Grafana Dashboard
+
+Grafana provides visualizations for metrics collected by Prometheus.
+- **Access:** [http://localhost:3000](http://localhost:3000)
+- **Configuration:** Connect Grafana to the Prometheus data source (typically at `http://prometheus:9090` within the Docker network).
+
+---
+
+## Logging
+
+Advanced logging facilitates troubleshooting.  
+- **Location:** `core/logging/logger.py`  
+- **Features:** Structured log output with configurable levels and formats.
+
+---
+
+## Redis Cache
+
+Redis caching reduces database load and improves performance.  
+- **Location:** `core/cache/cache.py`  
+- **Setup:** Ensure `REDIS_URL` is correctly set in `.env`.
+
+---
+
+## Usage
+
+### Register a New User
+
+Send a POST request to `/auth/register`:
+
+```bash
+curl -X POST http://localhost:8000/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"username": "testuser", "password": "Test@1234"}'
+```
+
+### Log In to Retrieve an Access Token
+
+Send a POST request to `/auth/token` with your credentials:
+
+```bash
+curl -X POST http://localhost:8000/auth/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=testuser&password=Test@1234"
+```
+
+You will receive a JSON response with the access token:
+
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "bearer"
+}
+```
+
+### Use the Ledger Endpoint to Add Credit
+
+With the obtained access token, add credit by sending a POST request to `/ledger`:
+
+```bash
+curl -X POST http://localhost:8000/ledger/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-access-token>" \
+  -d '{"owner_id": "testuser", "operation": "CREDIT_ADD", "amount": 10, "nonce": "unique-transaction-id"}'
+```
+
+On success, you will receive a confirmation message. Verify the updated balance:
+
+```bash
+curl -X GET http://localhost:8000/ledger/testuser \
+  -H "Authorization: Bearer <your-access-token>"
+```
 
 ---
 
 ## Redoc Documentation
 
-FastAPI provides Redoc out of the box. Visit:
-
+FastAPI provides Redoc out of the box. Visit:  
 ```
 http://localhost:8000/redoc
 ```
@@ -294,145 +488,134 @@ http://localhost:8000/redoc
 
 ## Testing
 
-1. **Run Tests**:
-
+1. **Run Tests:**
    ```bash
    pytest --maxfail=1 --disable-warnings -q
    ```
+2. **Test Directories:**
+   - **Core tests:** `tests/core/ledgers/`, `tests/core/auth/`, `tests/core/cache/`, etc.
+   - **Application tests:** `apps/app1/tests/`, `apps/app2/tests/`
 
-2. **Directory**:
-
-   - **core tests**: `tests/core/ledgers/`
-   - **app tests**: `apps/<app_name>/tests/`
+*Note:* The Docker Compose setup includes a dedicated test container that automatically runs tests when containers start.
 
 ---
 
 ## Migration Examples
 
-1. **Create a New Migration**:
-
+1. **Create a New Migration:**
    ```bash
    cd core/db/migrations
    alembic revision -m "Add ledger table"
    ```
-
-2. **Apply Migrations**:
-
+2. **Apply Migrations:**
    ```bash
    alembic upgrade head
    ```
-
-3. **App-Specific**:
-
+3. **App-Specific:**  
    Each app can maintain separate migration scripts if needed.
+4. **Real-World Example:**
+   ```python
+   # shared-ledger-system/core/db/migrations/alembic/versions/a71452189a36_initial_migration.py
+   """Initial migration
 
-4. **Real-World Example**:
+   Revision ID: a71452189a36
+   Revises: 
+   Create Date: 2025-02-05 16:30:59.255828
+   """
+   from typing import Sequence, Union
 
-```python
-# shared-ledger-system/core/db/migrations/alembic/versions/a71452189a36_initial_migration.py
-"""Initial migration
+   from alembic import op
+   import sqlalchemy as sa
 
-Revision ID: a71452189a36
-Revises: 
-Create Date: 2025-02-05 16:30:59.255828
+   # revision identifiers, used by Alembic.
+   revision: str = 'a71452189a36'
+   down_revision: Union[str, None] = None
+   branch_labels: Union[str, Sequence[str], None] = None
+   depends_on: Union[str, Sequence[str], None] = None
 
-"""
-from typing import Sequence, Union
+   def upgrade() -> None:
+       op.create_table('ledger_entries',
+           sa.Column('id', sa.Integer(), nullable=False),
+           sa.Column('operation', sa.String(), nullable=False),
+           sa.Column('amount', sa.Integer(), nullable=False),
+           sa.Column('nonce', sa.String(), nullable=False),
+           sa.Column('owner_id', sa.String(), nullable=False),
+           sa.Column('created_on', sa.DateTime(), nullable=False),
+           sa.PrimaryKeyConstraint('id'),
+           sa.UniqueConstraint('nonce')
+       )
+       op.create_index('idx_nonce', 'ledger_entries', ['nonce'], unique=False)
+       op.create_index('idx_owner_id', 'ledger_entries', ['owner_id'], unique=False)
 
-from alembic import op
-import sqlalchemy as sa
-
-
-# revision identifiers, used by Alembic.
-revision: str = 'a71452189a36'
-down_revision: Union[str, None] = None
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
-
-
-def upgrade() -> None:
-    # ### commands auto generated by Alembic - please adjust! ###
-    op.create_table('ledger_entries',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('operation', sa.String(), nullable=False),
-    sa.Column('amount', sa.Integer(), nullable=False),
-    sa.Column('nonce', sa.String(), nullable=False),
-    sa.Column('owner_id', sa.String(), nullable=False),
-    sa.Column('created_on', sa.DateTime(), nullable=False),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('nonce')
-    )
-    op.create_index('idx_nonce', 'ledger_entries', ['nonce'], unique=False)
-    op.create_index('idx_owner_id', 'ledger_entries', ['owner_id'], unique=False)
-    # ### end Alembic commands ###
-
-
-def downgrade() -> None:
-    # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_index('idx_owner_id', table_name='ledger_entries')
-    op.drop_index('idx_nonce', table_name='ledger_entries')
-    op.drop_table('ledger_entries')
-    # ### end Alembic commands ###
-
- ```
+   def downgrade() -> None:
+       op.drop_index('idx_owner_id', table_name='ledger_entries')
+       op.drop_index('idx_nonce', table_name='ledger_entries')
+       op.drop_table('ledger_entries')
+   ```
 
 ---
 
 ## Submission Guidelines
 
-1. **Submit via GitHub repository**
-
-2. **Include**:
-
+1. **Submit via GitHub repository.**
+2. **Include:**
    - Implementation
    - Tests
    - Documentation
    - Migration examples
-
-3. **Commit History**:
-
+3. **Commit History:**  
    Demonstrate step-by-step development progress.
 
 ---
 
 ## Recommendations
 
-- **Environment Management**:
+- **Environment Management:** Use a virtual environment to isolate dependencies.
+- **Dependency Management:** Employ a package manager (pip, poetry).
+- **Code Formatting:** Use a formatter (e.g., Black) for consistent style.
+- **Static Type Checking:** Use mypy or pyright to detect type errors.
+- **Linting:** Use flake8 or pylint for code quality checks.
 
-  Use a virtual environment to isolate dependencies.
-
-- **Dependency Management**:
-
-  Employ a package manager (pip, poetry).
-
-- **Code Formatting**:
-
-  Use a formatter (e.g., Black) for consistent style.
-
-- **Static Type Checking**:
-
-  Use mypy or pyright to detect type errors.
-
-- **Linting**:
-
-  Use flake8 or pylint for code quality checks.         
+---
 
 ## Contributing
 
-1. Fork the repository
-2. Create a new branch
-3. Commit your changes
-4. Push your changes
-5. Create a pull request    
-6. Request a pull requirements    
+1. Fork the repository  
+2. Create a new branch  
+3. Commit your changes  
+4. Push your changes  
+5. Create a pull request
 
+---
 
-## Acknowledgments  
+## Acknowledgments
 
 - [FastAPI](https://fastapi.tiangolo.com/)
 - [SQLAlchemy](https://www.sqlalchemy.org/)
 - [Pydantic](https://pydantic-docs.helpmanual.io/)
 - [Alembic](https://alembic.sqlalchemy.org/en/latest/)
+- [Redis](https://redis.io/)
+- [Prometheus](https://prometheus.io/)
+- [Grafana](https://grafana.com/)
+
+---
+
+## AI Tools Used
+
+This project leveraged several AI tools during development, documentation, and testing:
+
+- **Windsurf**
+- **Gemini**
+- **ChatGPT** (by OpenAI)
+- **Qwen**
+- **DeepSeek**
+- **Mistral**
+- *(and other similar tools)*
+
+---
 
 ## License
+
 This project is provided under the [MIT License](LICENSE), unless stated otherwise in your repository.
+
+---

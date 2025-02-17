@@ -1,26 +1,31 @@
 # apps/app1/src/api/ledgers/schemas.py
 from enum import Enum
-from core.ledgers.operations import LedgerOperationFactory
+from core.ledgers.operations import LedgerOperationFactory, BaseLedgerOperation
 
-# App1'e özel ledger operasyonları
-APP1_OPERATIONS = {
-    "DAILY_REWARD": "DAILY_REWARD",
-    "SIGNUP_CREDIT": "SIGNUP_CREDIT",
-    "CREDIT_SPEND": "CREDIT_SPEND",
-    "CREDIT_ADD": "CREDIT_ADD",
+app1_specific_operations_definitions = {
     "CONTENT_CREATION": "CONTENT_CREATION",
-    "CONTENT_ACCESS": "CONTENT_ACCESS"
+    "CONTENT_ACCESS": "CONTENT_ACCESS",
 }
 
-# Factory kullanarak Enum oluştur
-App1LedgerOperation = LedgerOperationFactory.create("App1LedgerOperation", APP1_OPERATIONS)
+shared_operations_definitions = BaseLedgerOperation.get_shared_operations()
 
-# Operasyon konfigürasyonu
-APP1_LEDGER_OPERATION_CONFIG = {
-    "DAILY_REWARD": 1,
-    "SIGNUP_CREDIT": 3,
-    "CREDIT_SPEND": -1,
-    "CREDIT_ADD": 10,
-    "CONTENT_CREATION": -5,
-    "CONTENT_ACCESS": 0,
+app1_operations_definitions = {
+    **shared_operations_definitions,
+    **app1_specific_operations_definitions,
 }
+
+App1LedgerOperation: Enum = LedgerOperationFactory.create(
+    "App1LedgerOperation", app1_operations_definitions
+)
+
+app1_ledger_operation_configuration = {
+    App1LedgerOperation.DAILY_REWARD: 1,
+    App1LedgerOperation.SIGNUP_CREDIT: 3,
+    App1LedgerOperation.CREDIT_SPEND: -1,
+    App1LedgerOperation.CREDIT_ADD: 10,
+    App1LedgerOperation.CONTENT_CREATION: -5,
+    App1LedgerOperation.CONTENT_ACCESS: 0,
+}
+
+APP1_LEDGER_OPERATION_CONFIG = app1_ledger_operation_configuration
+APP1_OPERATIONS_ENUM = App1LedgerOperation
